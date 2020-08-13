@@ -6,5 +6,3 @@
 
 ### To run
 ```$ ./4dchess```
-
-works like shit
