@@ -6,8 +6,39 @@ void bfparse(string*);
 
 int main(int argc, char* argv[])
 {
-	string* bf = str_input();
+	string* bf;
+	if(argc == 1)
+	{
+		bf = str_input();
+	}
+	else
+	{
+		FILE *fp;
+		long lSize;
+		char *buffer;
 
+		fp = fopen ( argv[1] , "rb" );
+		if( !fp ) perror(argv[1]),exit(1);
+
+		fseek( fp , 0L , SEEK_END);
+		lSize = ftell( fp );
+		rewind( fp );
+
+		/* allocate memory for entire content */
+		buffer = calloc( 1, lSize+1 );
+		if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
+
+		/* copy the file into the buffer */
+		if( 1!=fread( buffer , lSize, 1 , fp) )
+			fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
+
+		/* do your work here, buffer is a string contains the whole text */
+		fclose(fp);
+
+		bf = str_create(NULL);
+		bf = str_join(bf, buffer);
+		free(buffer);
+	}
 	bfparse(bf);
 	return 0;
 }
@@ -33,7 +64,7 @@ void bfparse(string* s)
 				move(i, 0, 1);
 				break;
 			//dim1
-			case 'V':
+			case 'v':
 				move(i, 1, 0);
 				break;
 			case '^':
