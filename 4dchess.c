@@ -1,6 +1,8 @@
 #include "lib/string/str.h"
+#include <stdbool.h>
 
-void bfparse(string* s);
+void move(char*, char, bool);
+void bfparse(string*);
 
 int main(int argc, char* argv[])
 {
@@ -13,38 +15,59 @@ int main(int argc, char* argv[])
 void bfparse(string* s)
 {
 	size_t loop;
-	string* memory = str_create("\0\0");
-	int i = 0, c;
+	char memory[8][8][8][8];
 
+	size_t c;
+	char i[4] = {0};
+
+	#define MEMORY_VALUE memory[i[1]][i[2]][i[3]][i[4]]
 	for(c=0; c<s->len; c++)
 	{
 		switch(s->data[c])
 		{
+			//dim0
 			case '<':
-				--i;
-				if(i<0)
-					printf("Oops, cannot go below zero memory\n");
-					i = 0;
+				move(i, 0, 0);
 				break;
 			case '>':
-				++i;
-				if(i>=memory->len)
-					str_push_back(memory, 0);
+				move(i, 0, 1);
 				break;
+			//dim1
+			case 'V':
+				move(i, 1, 0);
+				break;
+			case '^':
+				move(i, 1, 1);
+				break;
+			//dim2
+			case 'o':
+				move(i, 2, 0);
+				break;
+			case '*':
+				move(i, 2, 1);
+				break;
+			//dim3
+			case '?':
+				move(i, 3, 0);
+				break;
+			case '@':
+				move(i, 3, 1);
+				break;
+
 			case '+':
-				memory->data[i]++;
+				MEMORY_VALUE++;
 				break;
 			case '-':
-				memory->data[i]--;
+				MEMORY_VALUE--;
 				break;
 			case '.':
-				printf("%c",memory->data[i]);
+				printf("%c", MEMORY_VALUE);
 				break;
 			case ',':
-				memory->data[i]=getchar();
+				MEMORY_VALUE=getchar();
 				break;
 			case '[':
-				if(memory->data[i])
+				if(MEMORY_VALUE)
 				{
 					continue;
 				}
@@ -66,7 +89,7 @@ void bfparse(string* s)
 				}
 				break;
 			case ']':
-				if(memory->data[i]==0)
+				if(!MEMORY_VALUE)
 					continue;
 				loop = 1;
 				while (loop > 0)
@@ -84,4 +107,15 @@ void bfparse(string* s)
 				break;
 		}
 	}
+}
+
+void move(char* i, char dim, bool inc)
+{
+	if(inc)
+		++i[dim];
+	else
+		--i[dim];
+	if(i[dim]>8)
+		printf("Fallen off of hypercube at %d,%d,%d,%d,", i);
+		exit(1);
 }
